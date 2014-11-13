@@ -1,0 +1,159 @@
+FORMAT: 1A
+
+# RHQ.next Inventory
+This is a draft of the REST API of inventory in RHQ.next.
+
+## Feed [/feeds/{id}]
+
++ Model (application/json)
+
+        {
+            "id" : "1234-asdfklj-234343",
+            "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
+        }
+
++ Parameters
+        
+    + id (required, uuid) ... the assigned ID of the feed.
+
+### Get a single feed [GET]
+
++ Response 200
+    
+    [Feed][]
+
+### Delete the feed from RHQ along with everything it defines [DELETE]
++ Response 204
+
+## Feeds [/feeds]
+Feed registration, etc.
+
+### Registration [POST]
+This is where the feeds register themselves.
+
++ Request (application/json)
+        
+        {
+            "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration"]    
+        }
+
++ Response 201
+        
+    [Feed][]
+
+### Feeds Collection [GET]
+Returns all feeds that rhq knows of.
+
++ Response 200 (application/json)
+    
+        [
+            { 
+                "id" : "1234-asdfklj-234343",
+                "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
+            }
+        ]
+
+
+## Discovery [/discovery]
+Receiving discovery reports.
+
+
+## Resource [/resources{?id,address}]
+Work with resources.
+
++ Model (application/json)
+
+        {
+            "id" : "2132-232-dakjhfd-",
+            "address" : "rhq://agentX/PLATFORM/cpu1"
+            "metrics" : [
+                {
+                    "id" : "collectd://agentX/localhost.cpu.cpu1.load",
+                    "definition" : "/data/
+                }
+            ],
+            "connection" : {},
+            "configuration" : {},
+            "operations" : []
+        }
+
+### Get a single resource [GET]
++ Parameters
+    + id (optional, uuid, `123`) ... 
+        Resources are server side concept, so they have a server-side ID.
+        Either ID or address is required to get a resource.
+    + address (optional, string, `rhq://agentX/PLATFORM/cpu1`) ...
+        The address of the resource in the agent-specific format. This will
++ Response 200 (application/json)
+
+## Data [/data]
+Work with individual data points.
+
+### Add a data point [POST]
++ Request (application/json)
+ 
+        []
+
++ Response 201 (application/json)
+
+        []
+
+## Type [/types]
+Work with resource and data types.
+
+## Query [/query]
+The querying interface.
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Group Notes
+Notes related resources of the **Notes API**
+
+## Notes Collection [/notes]
+### List all Notes [GET]
++ Response 200 (application/json)
+
+        [{
+          "id": 1, "title": "Jogging in park"
+        }, {
+          "id": 2, "title": "Pick-up posters from post-office"
+        }]
+
+### Create a Note [POST]
++ Request (application/json)
+
+        { "title": "Buy cheese and bread for breakfast." }
+
++ Response 201 (application/json)
+
+        { "id": 3, "title": "Buy cheese and bread for breakfast." }
+
+## Note [/notes/{id}]
+A single Note object with all its details
+
++ Parameters
+    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+
+### Retrieve a Note [GET]
++ Response 200 (application/json)
+
+    + Header
+
+            X-My-Header: The Value
+
+    + Body
+
+            { "id": 2, "title": "Pick-up posters from post-office" }
+
+### Remove a Note [DELETE]
++ Response 204

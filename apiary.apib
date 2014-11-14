@@ -9,17 +9,18 @@ This is a draft of the REST API of inventory in RHQ.next.
 
         {
             "id" : "1234-abcd",
-            "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
+            "capabilities" : ["identity", "resources", "discovery", 
+                              "monitor", "operations", "configuration"]
         }
 
 + Parameters
-        
+
     + id (required, string) ... the assigned ID of the feed.
 
 ### Get a single feed [GET]
 
 + Response 200
-    
+
     [Feed][]
 
 ### Delete the feed from RHQ along with everything it defines [DELETE]
@@ -32,38 +33,44 @@ Feed registration, etc.
 This is where the feeds register themselves.
 
 + Request (application/json)
-        
+
         {
-            "id" : "suggested-unique-id", //this might or might not be accepted by the rhq server
-            "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration"]    
+            "id" : "suggested-unique-id", //this might or might not be 
+                                          //accepted by the rhq server
+            "capabilities" : ["identity", "resources", "discovery", 
+                              "monitor", "operations", "configuration"]    
         }
 
 + Response 201
-        
+
     [Feed][]
 
 ### Feeds Collection [GET]
 Returns all feeds that rhq knows of.
 
 + Response 200 (application/json)
-    
+
         [
             { 
                 "id" : "1234-abcd",
-                "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
+                "capabilities" : ["identity", "resources", "discovery", 
+                                  "monitor", "operations", "configuration"]
             }
         ]
 
 
 ## Discovery [/discovery]
-Receiving discovery reports. Note that this step is completely voluntary in the feed workflow and will be only performed by 
-feeds capable of discovery.
+Receiving discovery reports. Note that this step is completely voluntary
+in the feed workflow and will be only performed by feeds capable of 
+discovery.
 
 ### Send discovery report [POST]
-Sends the discovery report up to the server. The example request contains an example resource object for some of the
-possible feed types (rhq agent, collectd proxy, kubernetes proxy).
+Sends the discovery report up to the server. The example request contains
+an example resource object for some of the possible feed types (rhq agent, 
+collectd proxy, kubernetes proxy).
 
-The `dataDefs` list the ids (and optionally types) of the data that the resources are supposed to contain.
+The `dataDefs` list the ids (and optionally types) of the data that 
+the resources are supposed to contain.
 
 + Request (application/json)
 
@@ -84,10 +91,13 @@ The `dataDefs` list the ids (and optionally types) of the data that the resource
                     }
                 ]
             },
-            { //Collectd Proxy - notice the lack of agentID in the address - this needs to be resolved by hierarchy resolvers
-              //in another words, the address and the dataDefs ids are not final at the discovery time.
+            { //Collectd Proxy - notice the lack of agentID in the address 
+              //- this needs to be resolved by hierarchy resolvers
+              //in another words, the address and the dataDefs ids are 
+              //not final at the discovery time.
                 "address" : "collectd://localhost.cpu.cpu1",
-                "name" : "cpu1", //extracted from the collectd identifier of some metric received,
+                "name" : "cpu1", //extracted from the collectd identifier of
+                                 //some metric received,
                 "description" : null,
                 "version" : null,
                 "dataDefs" : [
@@ -111,9 +121,12 @@ The `dataDefs` list the ids (and optionally types) of the data that the resource
                     }
                 ]
             },
-            { //Feed that doesn't understand resources, but somehow knows the data types of the stuff it sends up.
-              //If it didn't know even that - it can merely start pushing data and RHQ will analyze it, represent it
-              //somehow in discovery queue (and drop it, because the resource would not be in the inventory).
+            { //Feed that doesn't understand resources, but somehow knows 
+              //the data types of the stuff it sends up. If it didn't know 
+              //even that - it can merely start pushing data and RHQ will 
+              //analyze it, represent it somehow in discovery queue (and 
+              //drop it, because the resource would not be in the 
+              //inventory).
                 "dataDefs" : [
                     {
                         "id" : "in-app-metric1",

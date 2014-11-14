@@ -10,4 +10,6 @@ experimental, not even POC-level quality.
 The REST API documentation and mock server rendered from the apiary.apib file is accessible here:
 http://docs.rhqnextinventory.apiary.io/
 
+You can comment on the API right there.
+
 

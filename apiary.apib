@@ -191,7 +191,6 @@ Work with resources.
             ]
         }
 
-### Get a single resource [GET]
 + Parameters
     + id (optional, uuid, `123`) ... 
         Resources are server side concept, so they have a server-side ID.
@@ -200,16 +199,29 @@ Work with resources.
         The address of the resource in the agent-specific format.
         Either id or address is required to get a resource.
 
+### Get a single resource [GET]
+
 + Response 200 (application/json)
 
     [Resource][]
-    
+ 
+### Delete a single resource [DELETE]
+Note that the resource is not deleted, it is merely flagged as such (in a 
+versioned manner).
+
++ Response 204
+
 ### Create a new resource [POST]
 This is going to create a new "synthetic" resource. This resource was not 
-suggested by any agent. It is created by the user of the API.
+suggested by any agent (agents do that via the `/discovery` endpoint). It 
+is created by the user of the API.
 
 Because the individual datapoints coming from the agent are addressable, we 
 can compose it from them.
+
+If either `id` or `address` parameter is specified, this is going to update 
+the definition of the resource (in a versioned manner). Otherwise a new 
+resource will be created.
 
 + Request (application/json)
 

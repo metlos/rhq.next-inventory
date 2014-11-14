@@ -7,3 +7,7 @@ Initially, I only use this for the apiary.io blueprint of the REST API.
 Other code might land here in the future but everything will be highly
 experimental, not even POC-level quality.
 
+The REST API documentation and mock server rendered from the apiary.apib file is accessible here:
+http://docs.rhqnextinventory.apiary.io/
+
+

@@ -8,13 +8,13 @@ This is a draft of the REST API of inventory in RHQ.next.
 + Model (application/json)
 
         {
-            "id" : "1234-asdfklj-234343",
+            "id" : "1234-abcd",
             "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
         }
 
 + Parameters
         
-    + id (required, uuid) ... the assigned ID of the feed.
+    + id (required, string) ... the assigned ID of the feed.
 
 ### Get a single feed [GET]
 
@@ -34,6 +34,7 @@ This is where the feeds register themselves.
 + Request (application/json)
         
         {
+            "id" : "suggested-unique-id", //this might or might not be accepted by the rhq server
             "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration"]    
         }
 
@@ -48,15 +49,81 @@ Returns all feeds that rhq knows of.
     
         [
             { 
-                "id" : "1234-asdfklj-234343",
+                "id" : "1234-abcd",
                 "capabilities" : ["identity", "resources", "discovery", "monitor", "operations", "configuration", ...]
             }
         ]
 
 
 ## Discovery [/discovery]
-Receiving discovery reports.
+Receiving discovery reports. Note that this step is completely voluntary in the feed workflow and will be only performed by 
+feeds capable of discovery.
 
+### Send discovery report [POST]
+Sends the discovery report up to the server. The example request contains an example resource object for some of the
+possible feed types (rhq agent, collectd proxy, kubernetes proxy).
+
+The `dataDefs` list the ids (and optionally types) of the data that the resources are supposed to contain.
+
++ Request (application/json)
+
+        [
+            { //RHQ agent
+                "address" : "rhq://1234-abcd/PLATFORM/cpu1",
+                "name" : "CPU1",
+                "description" : "kachny",
+                "version" : null,
+                "dataDefs" : [
+                    {
+                        "id" : "rhq://1234-abcd/PLATFORM/cpu1/systemLoad",
+                        "type" : "rhq-type://platforms/CPU/systemLoad"
+                    }, 
+                    {
+                        "id" : "rhq://1234-abcd/PLATFORM/cpu1/userLoad",
+                        "type" : "rhq-type://platforms/CPU/userLoad"
+                    }
+                ]
+            },
+            { //Collectd Proxy - notice the lack of agentID in the address - this needs to be resolved by hierarchy resolvers
+              //in another words, the address and the dataDefs ids are not final at the discovery time.
+                "address" : "collectd://localhost.cpu.cpu1",
+                "name" : "cpu1", //extracted from the collectd identifier of some metric received,
+                "description" : null,
+                "version" : null,
+                "dataDefs" : [
+                    {
+                        "id" : "collectd://localhost.cpu.cpu1.load",
+                        "type" : "collectd-type://cpu/load"
+                    },
+                    {
+                        "id" : "collectd://localhost.cpu.cpu1.wait",
+                        "type" : "collectd-type://cpu/wait"
+                    }
+                ]
+            },
+            { //Kubernetes Proxy
+                "address" : "kubernetes://1234-abcd/pod/pod1",
+                "name" : "pod1",
+                "dataDefs" : [
+                    {
+                        "id" : "cadvisor://1234-abcd/pod/pod1/metric",
+                        "type" : "cadvisor-type://..."
+                    }
+                ]
+            },
+            { //Feed that doesn't understand resources, but somehow knows the data types of the stuff it sends up.
+              //If it didn't know even that - it can merely start pushing data and RHQ will analyze it, represent it
+              //somehow in discovery queue (and drop it, because the resource would not be in the inventory).
+                "dataDefs" : [
+                    {
+                        "id" : "in-app-metric1",
+                        "type" : "custom-type:acme-property"
+                    },
+                ]
+            }
+        ]
+        
++ Response 201
 
 ## Resource [/resources{?id,address}]
 Work with resources.

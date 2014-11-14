@@ -163,38 +163,97 @@ Work with resources.
 
         {
             "id" : "9876-zyxw",
-            "address" : "collectd://1234-abcd/PLATFORM/cpu1"
+            "name" : "cpu0",
+            "description" : null,
+            "version" : null,
+            "address" : "rhq://1234-abcd/PLATFORM/cpu0"
             "metrics" : [
                 {
-                    "id" : "collectd://agentX/localhost.cpu.cpu1.load",
-                    "definition" : "/data/
+                    "id" : "collectd://hostX/cpu-0/cpu-load",
+                    "type" : "collectd-type://cpu/cpu-load"
                 }
             ],
-            "connection" : {},
-            "configuration" : {},
-            "operations" : []
+            "connection" : {
+                "username" : "kachnak",
+                "password" : "clear-text-ftw"
+            },
+            "connectionType" : "custom-type://username-and-password",
+            "configuration" : {
+                "frequency" : "100"
+            },
+            "configurationType" : 
+                "rhq-type://platforms/CPU/resourceConfiguration",
+            "operations" : [
+                {
+                    "id" : "rhq://1234-abcd/PLATFORM/cpu0/overclock",
+                    "type" : "rhq-type://platforms/CPU/overclock"
+                }
+            ]
         }
 
 ### Get a single resource [GET]
 + Parameters
     + id (optional, uuid, `123`) ... 
         Resources are server side concept, so they have a server-side ID.
-        Either ID or address is required to get a resource.
+        Either id or address is required to get a resource.
     + address (optional, string, `rhq://agentX/PLATFORM/cpu1`) ...
-        The address of the resource in the agent-specific format. This will
+        The address of the resource in the agent-specific format.
+        Either id or address is required to get a resource.
+
 + Response 200 (application/json)
 
+    [Resource][]
+    
+### Create a new resource [POST]
+This is going to create a new "synthetic" resource. This resource was not 
+suggested by any agent. It is created by the user of the API.
+
+Because the individual datapoints coming from the agent are addressable, we 
+can compose it from them.
+
++ Request (application/json)
+
+        {
+            "name" : "custom-cpu",
+            "description" : "my own CPU resource",
+            "metrics" : [
+                {
+                    "id" : "collectd://hostX/cpu-0/cpu-load",
+                    "type" : "collectd-type://cpu/cpu-load"
+                }
+            ],
+            "connection" : {
+                "username" : "kachnak",
+                "password" : "clear-text-ftw"
+            },
+            "connectionType" : "custom-type://username-and-password",
+            "configuration" : {
+                "frequency" : "100"
+            },
+            "configurationType" : 
+                "rhq-type://platforms/CPU/resourceConfiguration",
+            "operations" : [
+                {
+                    "id" : "rhq://1234-abcd/PLATFORM/cpu0/overclock",
+                    "type" : "rhq-type://platforms/CPU/overclock"
+                }
+            ]
+        }
++ Response 201 (application/json)
+
+    [Resource][]
+    
 ## Data [/data]
 Work with individual data points.
 
 ### Add a data point [POST]
-+ Request (application/json)
++ Request
  
         []
 
 + Response 201 (application/json)
 
-        []
+        [Resource][]
 
 ## Type [/types]
 Work with resource and data types.

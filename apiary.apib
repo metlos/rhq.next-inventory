@@ -91,23 +91,41 @@ the resources are supposed to contain.
                     }
                 ]
             },
-            { //Collectd Proxy - notice the lack of agentID in the address 
-              //- this needs to be resolved by hierarchy resolvers
-              //in another words, the address and the dataDefs ids are 
-              //not final at the discovery time.
-                "address" : "collectd://localhost.cpu.cpu1",
-                "name" : "cpu1", //extracted from the collectd identifier of
-                                 //some metric received,
+            { //Collectd Proxy - Collectd can either use the "true" hostname 
+              //as its host part of the identifier or it can be configured 
+              //to use a specific value for host.
+              //We can just use this value, because it is supposed to be 
+              //unique in the environment.
+              //Notice how collectd datum identifier is used to extract the
+              //agentID, resourceAddress and also resource name.
+              //
+              //The identifier has this form ([] denotes optional parts):
+              //host/plugin[-pluginInstance]/type[-typeInstance]
+              //we use this mapping:
+              //host = agentID
+              //plugin[-pluginInstance] = resourceAddress and name 
+              //(collectd "resources" are not hierarchical). 
+              //
+              //the type[-typeInstance] is not used for resource 
+              //identification because it is meant to identify the measured
+              //thing inside something that is designated by the 
+              //plugin[-pluginInstance] identifier.
+              //
+              //The type identifier is composed as follows:
+              //collectd-type://plugin/type-typeInstance
+              
+                "address" : "collectd://hostX/cpu-0",
+                "name" : "cpu-0",
                 "description" : null,
                 "version" : null,
                 "dataDefs" : [
                     {
-                        "id" : "collectd://localhost.cpu.cpu1.load",
-                        "type" : "collectd-type://cpu/load"
+                        "id" : "collectd://hostX/cpu-0/cpu-user",
+                        "type" : "collectd-type://cpu/cpu-user"
                     },
                     {
-                        "id" : "collectd://localhost.cpu.cpu1.wait",
-                        "type" : "collectd-type://cpu/wait"
+                        "id" : "collectd://hostX/cpu-0/cpu-idle",
+                        "type" : "collectd-type://cpu/cpu-idle"
                     }
                 ]
             },
@@ -144,8 +162,8 @@ Work with resources.
 + Model (application/json)
 
         {
-            "id" : "2132-232-dakjhfd-",
-            "address" : "rhq://agentX/PLATFORM/cpu1"
+            "id" : "9876-zyxw",
+            "address" : "collectd://1234-abcd/PLATFORM/cpu1"
             "metrics" : [
                 {
                     "id" : "collectd://agentX/localhost.cpu.cpu1.load",
